@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ระบบสร้างภาพปกผลงานครูนนทพัทธ์ หิรัญเรือง</title>
+    <title>Smart Cover Designer - ระบบสร้างภาพปก</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;800&family=Prompt:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #2563eb;
-            --glass-bg: rgba(255, 255, 255, 0.15); /* ปรับให้ใสขึ้นเพื่อให้เห็น BG ชัดขึ้น */
-            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
             --text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
@@ -17,8 +17,7 @@
             font-family: 'Prompt', sans-serif;
             margin: 0;
             padding: 0;
-            /* พื้นหลังสีเข้มขึ้นเล็กน้อยเพื่อให้ตัวหนังสือสีขาวเด่น */
-            background: linear-gradient(-45deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364); /* ธีมเข้มดูโปร */
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             min-height: 100vh;
@@ -26,7 +25,6 @@
             justify-content: center;
             align-items: center;
             color: #fff;
-            /* ป้องกันการเด้งของหน้าจอใน iOS */
             -webkit-text-size-adjust: 100%;
         }
 
@@ -43,7 +41,6 @@
             flex-wrap: wrap;
             gap: 20px;
             padding: 20px;
-            /* รองรับ Safe Area ของ iPhone */
             padding-bottom: env(safe-area-inset-bottom);
             box-sizing: border-box;
             animation: fadeIn 0.8s ease-out;
@@ -57,10 +54,10 @@
         /* Control Panel */
         .controls {
             flex: 1;
-            min-width: 320px;
-            background: rgba(0, 0, 0, 0.4); /* พื้นหลังดำจางๆ เพื่อให้อ่านเมนูง่ายบนมือถือ */
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px); /* iOS Safari Support */
+            min-width: 340px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 25px;
             border-radius: 24px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
@@ -68,15 +65,26 @@
         }
 
         h1 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: #fff;
-            margin-bottom: 20px;
+            margin: 0 0 5px 0;
             text-align: center;
             text-shadow: var(--text-shadow);
         }
 
+        .desc {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
         .input-group {
             margin-bottom: 18px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
         }
 
         label {
@@ -87,36 +95,45 @@
             color: #e2e8f0;
         }
 
-        /* Input Optimization for iOS */
-        input[type="text"], input[type="color"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid rgba(255,255,255,0.5);
-            border-radius: 12px;
-            font-family: 'Sarabun', sans-serif;
-            font-size: 16px; /* ป้องกัน iOS ซูม */
-            background: rgba(255,255,255,0.9);
-            color: #333;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            -webkit-appearance: none; /* ลบสไตล์เดิมของ iOS */
+        /* Row for Slider and Number Input */
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        input[type="color"] {
-            height: 45px;
-            padding: 2px;
-            cursor: pointer;
+        input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px; 
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            box-sizing: border-box;
         }
 
         input[type="range"] {
-            width: 100%;
-            margin-top: 10px;
-            height: 25px; /* เพิ่มพื้นที่สัมผัสให้นิ้วเลื่อนง่ายขึ้น */
+            flex-grow: 1;
             cursor: pointer;
+            height: 25px;
+        }
+
+        /* Number Input Styling */
+        input[type="number"] {
+            width: 70px;
+            padding: 5px;
+            border-radius: 8px;
+            border: none;
+            text-align: center;
+            font-family: 'Sarabun', sans-serif;
+            font-weight: bold;
+            font-size: 16px;
         }
 
         .btn-download {
-            background: linear-gradient(90deg, #FF512F 0%, #DD2476 100%);
+            background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%);
             color: white;
             border: none;
             padding: 18px;
@@ -125,23 +142,20 @@
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            -webkit-tap-highlight-color: transparent;
         }
 
-        .btn-download:active {
-            transform: scale(0.98);
-        }
+        .btn-download:active { transform: scale(0.98); }
 
         /* Preview Panel */
         .preview {
             flex: 2;
-            min-width: 100%; /* บนมือถือให้เต็มจอ */
+            min-width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -151,7 +165,7 @@
             width: 100%;
             height: auto;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
             background-color: #fff;
         }
 
@@ -159,28 +173,15 @@
             width: 100%;
             text-align: center;
             margin-top: 20px;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.5);
             font-size: 0.8rem;
         }
 
-        /* Mobile Specific Layout */
-        @media (min-width: 769px) {
-            .preview { min-width: 400px; } /* Desktop */
-        }
-
+        @media (min-width: 769px) { .preview { min-width: 400px; } }
         @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                padding: 10px;
-            }
-            .preview {
-                order: -1; /* เอารูปขึ้นก่อนเมนูในมือถือ */
-                margin-bottom: 10px;
-            }
-            .controls {
-                min-width: auto;
-                padding: 20px;
-            }
+            .container { flex-direction: column; padding: 10px; }
+            .preview { order: -1; margin-bottom: 10px; }
+            .controls { padding: 20px; }
         }
     </style>
 </head>
@@ -188,40 +189,55 @@
 
     <div class="container">
         <div class="controls">
-            <h1>🎨 สร้างปกผลงาน<br>ครูนนทพัทธ์ หิรัญเรือง</h1>
+            <h1>🎨 Smart Cover Designer</h1>
+            <p class="desc">
+                ระบบสร้างภาพปกผลงานครูนนทพัทธ์ หิรัญเรือง<br>
+                สร้างปกสวยงามระดับมืออาชีพได้ง่ายๆ และรวดเร็ว
+            </p>
             
             <div class="input-group">
                 <label>หัวข้อหลัก (Main Title)</label>
                 <input type="text" id="titleText" placeholder="ใส่ชื่อเรื่อง" value="ระบบ...">
-                <input type="range" id="titleSize" min="40" max="150" value="80">
-                <input type="range" id="titleY" min="100" max="800" value="380">
+                
+                <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ขนาดตัวอักษร (px)</label>
+                <div class="control-row">
+                    <input type="range" id="titleSize" min="40" max="200" value="80">
+                    <input type="number" id="titleSizeNum" value="80" min="40" max="200">
+                </div>
+
+                <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ตำแหน่ง (Y-Axis)</label>
+                <input type="range" id="titleY" min="100" max="800" value="380" style="width:100%">
             </div>
 
             <div class="input-group">
                 <label>หัวข้อรอง (Subtitle)</label>
                 <input type="text" id="subtitleText" placeholder="รายละเอียด (ถ้ามี)" value="">
-                <input type="range" id="subSize" min="20" max="100" value="40">
-                <input type="range" id="subY" min="100" max="850" value="480">
+                
+                <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ขนาดตัวอักษร (px)</label>
+                <div class="control-row">
+                    <input type="range" id="subSize" min="20" max="150" value="40">
+                    <input type="number" id="subSizeNum" value="40" min="20" max="150">
+                </div>
+
+                <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ตำแหน่ง (Y-Axis)</label>
+                <input type="range" id="subY" min="100" max="850" value="480" style="width:100%">
             </div>
 
             <div class="input-group">
                 <label>ชื่อเจ้าของผลงาน</label>
                 <input type="text" id="nameText" value="ครูนนทพัทธ์ หิรัญเรือง">
-                <input type="range" id="nameY" min="500" max="880" value="750">
+                <input type="range" id="nameY" min="500" max="880" value="750" style="width:100%">
             </div>
 
             <div class="input-group">
-                <label>สีตัวอักษร (เลือกสี)</label>
+                <label>สีตัวอักษร</label>
                 <input type="color" id="textColor" value="#ffffff">
             </div>
 
-            <button class="btn-download" onclick="downloadImage()">
+            <button class="btn-download" onclick="saveImage()">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                บันทึกภาพปก
+                บันทึกภาพ / แชร์ (iOS)
             </button>
-            <div style="text-align:center; margin-top:10px; font-size:0.8rem; color:rgba(255,255,255,0.7);">
-                *บน iPhone หากกดปุ่มแล้วภาพเด้งขึ้นมา<br>ให้แตะค้างที่ภาพแล้วเลือก "Save to Photos"
-            </div>
         </div>
 
         <div class="preview">
@@ -229,7 +245,7 @@
         </div>
         
         <div class="footer">
-            © 2026 ระบบสร้างปกอัตโนมัติ
+            © 2026 ระบบสร้างปกอัตโนมัติ | Nonthaphat Hiranrueang
         </div>
     </div>
 
@@ -241,83 +257,115 @@
         bgImage.crossOrigin = "Anonymous"; 
         bgImage.src = 'https://nonthaphathr.github.io/uploadimg/blankbg.png';
 
-        const inputs = {
+        // DOM Elements
+        const el = {
             title: document.getElementById('titleText'),
             titleSize: document.getElementById('titleSize'),
+            titleSizeNum: document.getElementById('titleSizeNum'),
             titleY: document.getElementById('titleY'),
+            
             sub: document.getElementById('subtitleText'),
             subSize: document.getElementById('subSize'),
+            subSizeNum: document.getElementById('subSizeNum'),
             subY: document.getElementById('subY'),
+            
             name: document.getElementById('nameText'),
             nameY: document.getElementById('nameY'),
             color: document.getElementById('textColor')
         };
 
+        // Initialize
         bgImage.onload = () => {
             draw();
             canvas.style.animation = "fadeIn 1.5s ease";
         };
+        
+        document.fonts.ready.then(() => draw());
 
-        // Redraw when fonts are fully loaded to prevent fallback font glitch
-        document.fonts.ready.then(function () {
-            draw();
-        });
+        // Event Listeners (Sync Slider <-> Number)
+        function syncInputs(slider, number) {
+            slider.addEventListener('input', () => {
+                number.value = slider.value;
+                draw();
+            });
+            number.addEventListener('input', () => {
+                slider.value = number.value;
+                draw();
+            });
+        }
 
-        Object.values(inputs).forEach(input => {
+        syncInputs(el.titleSize, el.titleSizeNum);
+        syncInputs(el.subSize, el.subSizeNum);
+
+        // Standard Listeners
+        [el.title, el.titleY, el.sub, el.subY, el.name, el.nameY, el.color].forEach(input => {
             input.addEventListener('input', draw);
         });
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw Background
             if (bgImage.complete) {
                 ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
             }
 
             ctx.textAlign = 'center';
-            ctx.fillStyle = inputs.color.value;
+            ctx.fillStyle = el.color.value;
 
             // Draw Title
-            ctx.font = `bold ${inputs.titleSize.value}px 'Prompt'`;
-            // Add slight shadow for better readability on any background
-            ctx.shadowColor = "rgba(0,0,0,0.3)";
+            ctx.font = `bold ${el.titleSize.value}px 'Prompt'`;
+            ctx.shadowColor = "rgba(0,0,0,0.4)";
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+            ctx.fillText(el.title.value, canvas.width / 2, parseInt(el.titleY.value));
+
+            // Draw Subtitle
+            ctx.font = `500 ${el.subSize.value}px 'Sarabun'`;
             ctx.shadowBlur = 4;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
-            ctx.fillText(inputs.title.value, canvas.width / 2, parseInt(inputs.titleY.value));
-
-            // Draw Subtitle
-            ctx.shadowBlur = 2;
-            ctx.font = `500 ${inputs.subSize.value}px 'Sarabun'`;
-            ctx.fillText(inputs.sub.value, canvas.width / 2, parseInt(inputs.subY.value));
+            ctx.fillText(el.sub.value, canvas.width / 2, parseInt(el.subY.value));
 
             // Draw Name
             ctx.font = `600 36px 'Sarabun'`; 
-            ctx.fillText(inputs.name.value, canvas.width / 2, parseInt(inputs.nameY.value));
+            ctx.fillText(el.name.value, canvas.width / 2, parseInt(el.nameY.value));
         }
 
-        function downloadImage() {
-            // Logic for easy download
+        // Advanced Save Function for iOS
+        async function saveImage() {
+            const fileName = 'Cover_' + new Date().getTime() + '.png';
+
+            // Check if Web Share API is supported (iOS 15+, Chrome Android)
+            if (navigator.canShare && navigator.share) {
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], fileName, { type: "image/png" });
+                    
+                    try {
+                        // Attempt to share (opens iOS Share Sheet)
+                        await navigator.share({
+                            files: [file],
+                            title: 'ปกผลงาน',
+                            text: 'สร้างปกสำเร็จแล้วโดยครูนนทพัทธ์',
+                        });
+                    } catch (error) {
+                        // User cancelled share or error
+                        console.log('Sharing failed or cancelled', error);
+                        // Fallback to simple download if share fails
+                        if (error.name !== 'AbortError') simpleDownload(fileName);
+                    }
+                }, 'image/png');
+            } else {
+                // Fallback for Desktop or older browsers
+                simpleDownload(fileName);
+            }
+        }
+
+        function simpleDownload(filename) {
             const link = document.createElement('a');
-            const filename = 'Cover_' + new Date().getTime() + '.png';
             link.download = filename;
             link.href = canvas.toDataURL('image/png');
-            
-            // Check if mobile device
-            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                // On some mobile browsers, direct download is blocked. 
-                // Opening in new tab is safer for user to manual save.
-                const win = window.open();
-                if(win){
-                    win.document.write('<img src="' + link.href + '" style="width:100%"/>');
-                    win.document.title = "กดค้างที่รูปเพื่อบันทึก";
-                } else {
-                    link.click();
-                }
-            } else {
-                link.click();
-            }
+            link.click();
         }
     </script>
 </body>
