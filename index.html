@@ -17,7 +17,7 @@
             font-family: 'Prompt', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364); /* ธีมเข้มดูโปร */
+            background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             min-height: 100vh;
@@ -51,7 +51,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Control Panel */
         .controls {
             flex: 1;
             min-width: 340px;
@@ -95,11 +94,26 @@
             color: #e2e8f0;
         }
 
-        /* Row for Slider and Number Input */
         .control-row {
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        /* Textarea for multiline title */
+        textarea#titleText {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
         }
 
         input[type="text"], input[type="color"] {
@@ -108,7 +122,7 @@
             border: 1px solid rgba(255,255,255,0.3);
             border-radius: 8px;
             font-family: 'Sarabun', sans-serif;
-            font-size: 16px; 
+            font-size: 16px;
             background: rgba(255,255,255,0.9);
             color: #333;
             box-sizing: border-box;
@@ -120,7 +134,6 @@
             height: 25px;
         }
 
-        /* Number Input Styling */
         input[type="number"] {
             width: 70px;
             padding: 5px;
@@ -130,6 +143,13 @@
             font-family: 'Sarabun', sans-serif;
             font-weight: bold;
             font-size: 16px;
+        }
+
+        /* Line height control for title */
+        .hint {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 5px;
         }
 
         .btn-download {
@@ -152,7 +172,6 @@
 
         .btn-download:active { transform: scale(0.98); }
 
-        /* Preview Panel */
         .preview {
             flex: 2;
             min-width: 100%;
@@ -197,12 +216,19 @@
             
             <div class="input-group">
                 <label>หัวข้อหลัก (Main Title)</label>
-                <input type="text" id="titleText" placeholder="ใส่ชื่อเรื่อง" value="ระบบ...">
-                
+                <textarea id="titleText" placeholder="ใส่ชื่อเรื่อง&#10;กด Enter เพื่อขึ้นบรรทัดใหม่">ระบบ...</textarea>
+                <p class="hint">💡 กด Enter เพื่อขึ้นบรรทัดใหม่</p>
+
                 <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ขนาดตัวอักษร (px)</label>
                 <div class="control-row">
                     <input type="range" id="titleSize" min="40" max="200" value="80">
                     <input type="number" id="titleSizeNum" value="80" min="40" max="200">
+                </div>
+
+                <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ระยะห่างระหว่างบรรทัด (Line Height)</label>
+                <div class="control-row">
+                    <input type="range" id="titleLineHeight" min="0.8" max="2.5" step="0.05" value="1.3">
+                    <input type="number" id="titleLineHeightNum" value="1.3" min="0.8" max="2.5" step="0.05">
                 </div>
 
                 <label style="margin-top:10px; font-size:0.8rem; color:#aaa;">ตำแหน่ง (Y-Axis)</label>
@@ -257,13 +283,14 @@
         bgImage.crossOrigin = "Anonymous"; 
         bgImage.src = 'https://nonthaphathr.github.io/uploadimg/blankbg.png';
 
-        // DOM Elements
         const el = {
             title: document.getElementById('titleText'),
             titleSize: document.getElementById('titleSize'),
             titleSizeNum: document.getElementById('titleSizeNum'),
             titleY: document.getElementById('titleY'),
-            
+            titleLineHeight: document.getElementById('titleLineHeight'),
+            titleLineHeightNum: document.getElementById('titleLineHeightNum'),
+
             sub: document.getElementById('subtitleText'),
             subSize: document.getElementById('subSize'),
             subSizeNum: document.getElementById('subSizeNum'),
@@ -274,7 +301,6 @@
             color: document.getElementById('textColor')
         };
 
-        // Initialize
         bgImage.onload = () => {
             draw();
             canvas.style.animation = "fadeIn 1.5s ease";
@@ -282,25 +308,34 @@
         
         document.fonts.ready.then(() => draw());
 
-        // Event Listeners (Sync Slider <-> Number)
         function syncInputs(slider, number) {
-            slider.addEventListener('input', () => {
-                number.value = slider.value;
-                draw();
-            });
-            number.addEventListener('input', () => {
-                slider.value = number.value;
-                draw();
-            });
+            slider.addEventListener('input', () => { number.value = slider.value; draw(); });
+            number.addEventListener('input', () => { slider.value = number.value; draw(); });
         }
 
         syncInputs(el.titleSize, el.titleSizeNum);
         syncInputs(el.subSize, el.subSizeNum);
+        syncInputs(el.titleLineHeight, el.titleLineHeightNum);
 
-        // Standard Listeners
         [el.title, el.titleY, el.sub, el.subY, el.name, el.nameY, el.color].forEach(input => {
             input.addEventListener('input', draw);
         });
+
+        /**
+         * วาดข้อความหลายบรรทัด โดย split ด้วย \n
+         * @param {string} text - ข้อความ (อาจมี \n)
+         * @param {number} x - ตำแหน่ง x
+         * @param {number} startY - ตำแหน่ง y ของบรรทัดแรก
+         * @param {number} fontSize - ขนาดตัวอักษร (px)
+         * @param {number} lineHeightMultiplier - ตัวคูณระยะบรรทัด
+         */
+        function drawMultilineText(text, x, startY, fontSize, lineHeightMultiplier) {
+            const lines = text.split('\n');
+            const lineHeight = fontSize * lineHeightMultiplier;
+            lines.forEach((line, i) => {
+                ctx.fillText(line, x, startY + i * lineHeight);
+            });
+        }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -312,13 +347,22 @@
             ctx.textAlign = 'center';
             ctx.fillStyle = el.color.value;
 
-            // Draw Title
-            ctx.font = `bold ${el.titleSize.value}px 'Prompt'`;
+            const titleSize = parseInt(el.titleSize.value);
+            const lineHeightMul = parseFloat(el.titleLineHeight.value);
+
+            // Draw Title (multiline)
+            ctx.font = `bold ${titleSize}px 'Prompt'`;
             ctx.shadowColor = "rgba(0,0,0,0.4)";
             ctx.shadowBlur = 6;
             ctx.shadowOffsetX = 3;
             ctx.shadowOffsetY = 3;
-            ctx.fillText(el.title.value, canvas.width / 2, parseInt(el.titleY.value));
+            drawMultilineText(
+                el.title.value,
+                canvas.width / 2,
+                parseInt(el.titleY.value),
+                titleSize,
+                lineHeightMul
+            );
 
             // Draw Subtitle
             ctx.font = `500 ${el.subSize.value}px 'Sarabun'`;
@@ -332,31 +376,24 @@
             ctx.fillText(el.name.value, canvas.width / 2, parseInt(el.nameY.value));
         }
 
-        // Advanced Save Function for iOS
         async function saveImage() {
             const fileName = 'Cover_' + new Date().getTime() + '.png';
 
-            // Check if Web Share API is supported (iOS 15+, Chrome Android)
             if (navigator.canShare && navigator.share) {
                 canvas.toBlob(async (blob) => {
                     const file = new File([blob], fileName, { type: "image/png" });
-                    
                     try {
-                        // Attempt to share (opens iOS Share Sheet)
                         await navigator.share({
                             files: [file],
                             title: 'ปกผลงาน',
                             text: 'สร้างปกสำเร็จแล้วโดยครูนนทพัทธ์',
                         });
                     } catch (error) {
-                        // User cancelled share or error
                         console.log('Sharing failed or cancelled', error);
-                        // Fallback to simple download if share fails
                         if (error.name !== 'AbortError') simpleDownload(fileName);
                     }
                 }, 'image/png');
             } else {
-                // Fallback for Desktop or older browsers
                 simpleDownload(fileName);
             }
         }
